@@ -25,6 +25,12 @@ public class TestController {
         return "Hi!";
     }
 
+    @GetMapping("/user")
+    public String getId(String token) {
+        // 这里可以再写一个拦截器+自定义注解去从 header中取出 userId，就不用在参数里再传token了。
+        return JwtUtil.getUserIdFromJwtToken(token);
+    }
+
     @GetMapping(value = "/login")
     public JSONObject login(HttpServletRequest request, HttpServletResponse response) {
         String phone = request.getParameter("phone");

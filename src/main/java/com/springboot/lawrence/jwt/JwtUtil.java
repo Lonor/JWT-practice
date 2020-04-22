@@ -7,6 +7,7 @@ import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,16 +29,17 @@ public class JwtUtil {
     /**
      * 初始化head部分的数据为(第一部分)
      * {
-     *      "alg":"HS256",
-     *      "type":"JWT"
+     * "alg":"HS256",
+     * "type":"JWT"
      * }
      */
     private static final JWSHeader HEADER = new JWSHeader(JWSAlgorithm.HS256, JOSEObjectType.JWT, null, null, null, null, null, null, null, null, null, null, null);
 
     /**
      * 生成token，该方法只在用户登录成功后调用
+     *
      * @param payload Map集合，可以存储用户id，token生成时间，token过期时间等自定义字段
-     * @return token字符串,若失败则返回null
+     * @return token字符串, 若失败则返回null
      */
     public static String createToken(Map<String, Object> payload) {
         String tokenString = null;
@@ -55,8 +57,29 @@ public class JwtUtil {
     }
 
     /**
+     * 临时的方法
+     *
+     * @param token token
+     * @return 用户id
+     */
+    public static String getUserIdFromJwtToken(String token) {
+        JWSObject jwsObject;
+        JSONObject jsonObject;
+        try {
+            jwsObject = JWSObject.parse(token);
+            Payload payload = jwsObject.getPayload();
+            jsonObject = payload.toJSONObject();
+            return (String) jsonObject.get("uid");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
      * 校验token是否合法，返回Map集合,集合中主要包含    state状态码   data鉴权成功后从token中提取的数据
      * 该方法在过滤器中调用，每次请求API时都校验
+     *
      * @param token token
      * @return Map<String, Object>
      */
@@ -67,16 +90,16 @@ public class JwtUtil {
             // palload就是JWT构成的第二部分不过这里自定义的是私有声明(标准中注册的声明, 公共的声明)
             Payload payload = jwsObject.getPayload();
             JWSVerifier verifier = new MACVerifier(SECRET);
-            if(jwsObject.verify(verifier)) {
+            if (jwsObject.verify(verifier)) {
                 JSONObject jsonObject = payload.toJSONObject();
                 // token检验成功（此时没有检验是否过期）
                 resultMap.put("state", TokenState.VALID.toString());
                 // 若payload包含ext字段，则校验是否过期
-                if(jsonObject.containsKey("ext")) {
+                if (jsonObject.containsKey("ext")) {
                     long extTime = Long.parseLong(jsonObject.get("ext").toString());
                     long curTime = System.currentTimeMillis();
                     // 过期了
-                    if(curTime > extTime) {
+                    if (curTime > extTime) {
                         resultMap.clear();
                         resultMap.put("state", TokenState.EXPIRED.toString());
                     }
