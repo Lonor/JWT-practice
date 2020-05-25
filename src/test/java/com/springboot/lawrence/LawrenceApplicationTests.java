@@ -1,5 +1,6 @@
 package com.springboot.lawrence;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -52,9 +55,24 @@ public class LawrenceApplicationTests {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", 4000);
         jsonObject.put("msg", "您的token不合法或者过期了，请重新登陆");
-        mvc.perform(MockMvcRequestBuilders.get("/api/test") /* .header("token", "12345") */)
+        mvc.perform(MockMvcRequestBuilders.get("/api/test"))
                 .andExpect(MockMvcResultMatchers.content().json(jsonObject.toJSONString()));
     }
 
+    @Test
+    public void login() throws Exception {
+        JSONObject okJson = new JSONObject(2);
+        okJson.put("code", 200);
+        okJson.put("msg", "Hi");
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/api/login")
+                .param("phone", "123456789"));
+        MvcResult mvcResult = resultActions.andReturn();
+        String content = mvcResult.getResponse().getContentAsString();
+        JSONObject res = JSONObject.parseObject(content);
+        String token = res.getString("token");
+        mvc.perform(MockMvcRequestBuilders.get("/api/test").header("token", token))
+                .andExpect(MockMvcResultMatchers.content().json(okJson.toJSONString()))
+                .andDo(MockMvcResultHandlers.print());
+    }
 
 }

@@ -29,16 +29,19 @@ public class TestController {
     }
 
     @GetMapping("/user")
-    public String getId(String token) {
-        // 这里可以再写一个拦截器+自定义注解去从 header中取出 userId，就不用在参数里再传token了。
-        return JwtUtil.getUserIdFromJwtToken(token);
+    public JSONObject getId(String token) {
+        // 这里可以再写一个拦截器+自定义注解去从 header 中取出 userId，就不用在参数里再传 token 了。
+        JSONObject jsonObject = new JSONObject(2);
+        jsonObject.put("code", 200);
+        jsonObject.put("msg", JwtUtil.getUserIdFromJwtToken(token));
+        return jsonObject;
     }
 
     @GetMapping(value = "/login")
     public JSONObject login(HttpServletRequest request, HttpServletResponse response) {
         String phone = request.getParameter("phone");
         String password = request.getParameter("code");
-        //这个步骤就是获取user的全部信息不重要，直接忽略
+        // 这个步骤就是获取 user 的全部信息不重要，直接忽略
         Long userId = Long.parseLong(phone);
         String token = createPayLoad(userId);
         JSONObject jsonObject = new JSONObject();
