@@ -33,6 +33,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        LOGGER.info("--- 进入拦截器！---");
         // 前段ajax自定义headers字段，会出现了option请求，在GET请求之前。
         // 所以应该把他过滤掉，以免影响服务。但是不能返回false，如果返回false会导致后续请求不会继续。
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -52,7 +53,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 LOGGER.warn("无效token");
                 //JsonData是返回给前端的json格式(不重要)
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("code", 2000);
+                jsonObject.put("code", 4000);
                 jsonObject.put("msg", "您的token不合法或者过期了，请重新登陆");
                 output(jsonObject, response);
                 break;

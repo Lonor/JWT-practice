@@ -21,8 +21,11 @@ import java.util.Map;
 public class TestController {
 
     @GetMapping("/test")
-    public String test() {
-        return "Hi!";
+    public JSONObject test() {
+        JSONObject jsonObject = new JSONObject(2);
+        jsonObject.put("code", 200);
+        jsonObject.put("msg", "Hi");
+        return jsonObject;
     }
 
     @GetMapping("/user")
