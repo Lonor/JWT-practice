@@ -1,7 +1,5 @@
 [![codecov](https://codecov.io/gh/Lonor/JWT-practice/branch/master/graph/badge.svg?token=M57NG2928G)](https://codecov.io/gh/Lonor/JWT-practice)
 
-[![codecov_graph](https://codecov.io/gh/Lonor/JWT-practice/graphs/tree.svg?token=M57NG2928G)](https://codecov.io/gh/Lonor/JWT-practice)
-
 HTTP API：
 
 地址：localhost:8080
