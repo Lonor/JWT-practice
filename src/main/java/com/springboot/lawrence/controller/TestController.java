@@ -1,4 +1,4 @@
-package com.springboot.lawrence.Controller;
+package com.springboot.lawrence.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.springboot.lawrence.jwt.JwtUtil;
