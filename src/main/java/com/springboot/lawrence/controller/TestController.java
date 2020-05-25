@@ -40,7 +40,6 @@ public class TestController {
     @GetMapping(value = "/login")
     public JSONObject login(HttpServletRequest request, HttpServletResponse response) {
         String phone = request.getParameter("phone");
-        String password = request.getParameter("code");
         // 这个步骤就是获取 user 的全部信息不重要，直接忽略
         Long userId = Long.parseLong(phone);
         String token = createPayLoad(userId);
