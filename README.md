@@ -17,4 +17,3 @@ GET /api/login?phone={phone}
 ```text
 GET /api/test
 ```
-
