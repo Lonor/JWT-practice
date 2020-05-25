@@ -29,3 +29,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# system ignore
+.DS_Store
+Thumbs.db
+Servers
+.metadata
+temp
