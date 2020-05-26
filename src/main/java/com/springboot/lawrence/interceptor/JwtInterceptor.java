@@ -25,6 +25,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     private void output(JSONObject jsonObject, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(401);
         PrintWriter out = response.getWriter();
         out.write(Objects.requireNonNull(jsonObject.toJSONString()));
         out.flush();
@@ -39,19 +40,18 @@ public class JwtInterceptor implements HandlerInterceptor {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
         }
-        //从请求头中获取token
+        // 从请求头中获取token
         String token = request.getHeader("token");
         Map<String, Object> resultMap = JwtUtil.validToken(token);
         TokenState state = TokenState.getTokenState((String) resultMap.get("state"));
         switch (state) {
             case VALID:
-                //　取出payload中数据，放到request作用域中
+                // 取出payload中数据，放到request作用域中
                 request.setAttribute("data", resultMap.get("data"));
                 return true;
             case EXPIRED:
             case INVALID:
                 LOGGER.warn("无效token");
-                //JsonData是返回给前端的json格式(不重要)
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("code", 4000);
                 jsonObject.put("msg", "您的token不合法或者过期了，请重新登陆");
