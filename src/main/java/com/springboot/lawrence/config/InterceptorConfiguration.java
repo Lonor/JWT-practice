@@ -24,6 +24,6 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 放行登录，拦截其他需要 token 的接口
         LOGGER.info("注册拦截器");
-        registry.addInterceptor(jwtInterceptor).addPathPatterns("/**").excludePathPatterns("/**/login");
+        registry.addInterceptor(jwtInterceptor).addPathPatterns("/**").excludePathPatterns("/*/login");
     }
 }
