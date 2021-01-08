@@ -1,5 +1,6 @@
 package com.springboot.lawrence.jwt;
 
+import com.alibaba.fastjson.JSONObject;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -9,7 +10,6 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
-import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class JwtUtil {
      * "type":"JWT"
      * }
      */
-    private static final JWSHeader HEADER = new JWSHeader(JWSAlgorithm.HS256, JOSEObjectType.JWT, null, null, null, null, null, null, null, null, null, null, null);
+    private static final JWSHeader HEADER = new JWSHeader(JWSAlgorithm.HS256, JOSEObjectType.JWT, null, null, null, null, null, null, null, null, null, true, null, null);
 
     /**
      * 生成token，该方法只在用户登录成功后调用
@@ -50,7 +50,7 @@ public class JwtUtil {
     public static String createToken(Map<String, Object> payload) {
         String tokenString = null;
         // 创建一个JWS Object(第二部分)
-        JWSObject jwsObject = new JWSObject(HEADER, new Payload(new JSONObject(payload)));
+        JWSObject jwsObject = new JWSObject(HEADER, new Payload(new JSONObject(payload).toJSONString()));
         try {
             // 将jwsObject进行HMAC签名，相当于加密(第三部分)
             jwsObject.sign(new MACSigner(SECRET));
@@ -70,12 +70,11 @@ public class JwtUtil {
      */
     public static String getUserIdFromJwtToken(String token) {
         JWSObject jwsObject;
-        JSONObject jsonObject;
         try {
             jwsObject = JWSObject.parse(token);
             Payload payload = jwsObject.getPayload();
-            jsonObject = payload.toJSONObject();
-            return (String) jsonObject.get("uid");
+            return (String) payload.toJSONObject().get("uid");
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -97,12 +96,13 @@ public class JwtUtil {
             Payload payload = jwsObject.getPayload();
             JWSVerifier verifier = new MACVerifier(SECRET);
             if (jwsObject.verify(verifier)) {
-                JSONObject jsonObject = payload.toJSONObject();
+
+                Map<String, Object> payloadMap = payload.toJSONObject();
                 // token检验成功（此时没有检验是否过期）
                 resultMap.put("state", TokenState.VALID.toString());
                 // 若payload包含ext字段，则校验是否过期
-                if (jsonObject.containsKey("ext")) {
-                    long extTime = Long.parseLong(jsonObject.get("ext").toString());
+                if (payloadMap.containsKey("ext")) {
+                    long extTime = Long.parseLong(payloadMap.get("ext").toString());
                     long curTime = System.currentTimeMillis();
                     // 过期了
                     if (curTime > extTime) {
@@ -110,7 +110,7 @@ public class JwtUtil {
                         resultMap.put("state", TokenState.EXPIRED.toString());
                     }
                 }
-                resultMap.put("data", jsonObject);
+                resultMap.put("data", payloadMap);
             } else {
                 // 检验失败
                 resultMap.put("state", TokenState.INVALID.toString());
