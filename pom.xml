@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<alibaba.fastjson.version>1.2.75</alibaba.fastjson.version>
-        <nimbusds-jose-jwt.version>9.6</nimbusds-jose-jwt.version>
+        <nimbusds-jose-jwt.version>9.7</nimbusds-jose-jwt.version>
 	</properties>
 
 	<dependencies>
